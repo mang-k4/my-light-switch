@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Light Control</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #f0f2f5; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-block; }
+        h1 { color: #1c1e21; }
+        #statusText { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; }
+        .btn { padding: 15px 40px; font-size: 20px; border: none; border-radius: 50px; cursor: pointer; color: white; transition: 0.3s; width: 100%; margin: 10px 0; }
+        .btn-on { background-color: #28a745; }
+        .btn-off { background-color: #dc3545; }
+        .btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>ระบบควบคุมไฟ</h1>
+        <div id="statusText">กำลังเชื่อมต่อ...</div>
+        <button class="btn btn-on" onclick="sendData(1)">เปิดไฟ (ON)</button>
+        <button class="btn btn-off" onclick="sendData(0)">ปิดไฟ (OFF)</button>
+    </div>
+
+    <script>
+        // --- ส่วนที่ต้องเติมข้อมูลของคุณ ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCpm-ASXEoZNI09ehc8YF3MIk_4yxXvXbI", // อย่าลืมใส่ API Key นะครับ
+            databaseURL: "https://home-front-light-default-rtdb.asia-southeast1.firebasedatabase.app/"  // อย่าลืมใส่ databaseURL นะครับ
+        };
+        // -----------------------------
+
+        // เริ่มต้นการทำงาน Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // ฟังก์ชันส่งค่า 0 หรือ 1
+        function sendData(value) {
+            database.ref('lightStatus').set(value);
+        }
+
+        // ดึงค่าแบบ Real-time มาแสดงบนหน้าเว็บ
+        database.ref('lightStatus').on('value', (snapshot) => {
+            const val = snapshot.val();
+            const statusDisplay = document.getElementById('statusText');
+            if (val === 1) {
+                statusDisplay.innerText = "สถานะปัจจุบัน: เปิดอยู่ 🟢";
+                statusDisplay.style.color = "#28a745";
+            } else {
+                statusDisplay.innerText = "สถานะปัจจุบัน: ปิดอยู่ 🔴";
+                statusDisplay.style.color = "#dc3545";
+            }
+        });
+    </script>
+</body>
+</html>
